@@ -1,8 +1,7 @@
-defaultBaseImage: scratch
+defaultBaseImage: cgr.dev/chainguard/static
 defaultPlatforms:
 - linux/arm64
 - linux/amd64
-- windows/amd64
 builds:
 - id: app
   main: .
