@@ -1,0 +1,5 @@
+.DS_Store
+*.log
+sequentialthinking-server
+dist/
+node_modules/
