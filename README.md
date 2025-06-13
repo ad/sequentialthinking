@@ -67,14 +67,17 @@ open http://localhost:8080
 ## 🚀 Usage
 
 ### Integration with VS Code
-Create a `.vscode/mcp.json` file in your project root:
+~/Library/Application Support/Code/User/settings.json
+
 ```json
 {
-  "servers": {
-    "sequentialthinking": {
-      "type": "stdio", 
-      "command": "/absolute/path/to/sequentialthinking-server",
-      "args": ["--stdio"]
+  "mcp": {
+    "servers": {
+      "sequentialthinking": {
+        "type": "stdio", 
+        "command": "/absolute/path/to/sequentialthinking-server",
+        "args": ["--stdio"]
+      }
     }
   }
 }
@@ -83,13 +86,16 @@ Create a `.vscode/mcp.json` file in your project root:
 or use docker:
 
 ```json
+// ~/Library/Application Support/Code/User/settings.json
 {
-  "servers": {
-    "sequentialthinking": {
-      "type": "stdio",
-      "command": "docker",
-      "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "--stdio"]
-    },
+  "mcp": {
+    "servers": {
+      "sequentialthinking": {
+        "type": "stdio",
+        "command": "docker",
+        "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "--stdio"]
+      },
+    }
   }
 }
 ```
