@@ -1,55 +1,73 @@
 # Sequential Thinking MCP Server
 
-🧠 **Интеллектуальный MCP сервер** для пошагового анализа и решения сложных задач с поддержкой **двух режимов работы**: 
-- **Stdio режим** для полной совместимости с MCP клиентами (VS Code, Claude Desktop)
-- **HTTP+SSE режим** для веб-интерфейса и расширенной отладки
+🧠 **Intelligent MCP Server** for step-by-step analysis and solving complex problems with support for **two operating modes**:
+- **Stdio mode** for full compatibility with MCP clients (VS Code, Claude Desktop)
+- **HTTP+SSE mode** for web interface and advanced debugging
 
-*Обновлено: 13 июня 2025*
+## ⚡ Quick Start
 
-## ⚡ Быстрый старт
-
-### 1. Сборка проекта
+### 1. Building the project
 ```bash
-# Клонирование репозитория
-git clone <repository-url>
+# Clone repository
+git clone https://github.com/ad/sequentialthinking.git
 cd sequentialthinking
 
-# Автоматическая сборка (рекомендуется)
-./build.sh
-
-# Или ручная сборка
+# Local build using Go
 go build -o sequentialthinking-server main.go
+
+# Or using Make
+make build-local
+
+# Docker build
+make build
 ```
 
-### 2. Запуск сервера
+### 2. Running the server
 
-#### 📡 Для MCP клиентов (VS Code, Claude Desktop)
+#### 📡 For MCP clients (VS Code, Claude Desktop)
 ```bash
 ./sequentialthinking-server --stdio
+# Or using Make
+make run-stdio
 ```
 
-#### 🌐 Для веб-разработки и отладки  
+#### 🌐 For web development and debugging
 ```bash
 ./sequentialthinking-server
-# или с настройкой порта
+# Or with custom port
 PORT=3000 ./sequentialthinking-server
+# Or using Make
+make run-local
 ```
 
-### 3. Тестирование
+#### 🐳 Using Docker
 ```bash
-# Автоматическое тестирование
+# Run in Docker
+make run
+# Or manually
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest
+```
+
+### 3. Testing
+```bash
+# Automated testing
 ./test.sh
 
-# Веб-интерфейс
+# Go unit tests
+go test -v
+# Or using Make
+make test
+
+# Web interface
 open http://localhost:8080
 ```
 
 
 
-## 🚀 Использование
+## 🚀 Usage
 
-### Интеграция с VS Code
-Создайте файл `.vscode/mcp.json` в корне проекта:
+### Integration with VS Code
+Create a `.vscode/mcp.json` file in your project root:
 ```json
 {
   "servers": {
@@ -62,8 +80,22 @@ open http://localhost:8080
 }
 ```
 
-### Интеграция с Claude Desktop
-Добавьте в `claude_desktop_config.json`:
+or use docker:
+
+```json
+{
+  "servers": {
+    "sequentialthinking": {
+      "type": "docker",
+      "image": "danielapatin/sequentialthinking:latest",
+      "args": ["--stdio"]
+    }
+  }
+}
+```
+
+### Integration with Claude Desktop
+Add to `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
@@ -75,40 +107,57 @@ open http://localhost:8080
 }
 ```
 
-### Docker развертывание
+### Docker deployment
 ```bash
-# Сборка образа
-docker build -t sequentialthinking .
+# Build image
+docker build -t danielapatin/sequentialthinking:latest .
+# Or using Make
+make build
 
-# Запуск контейнера
-docker run --rm -i sequentialthinking
+# Run container
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest
+# Or using Make
+make run
 ```
 
-## 🔍 Тестирование и отладка
-
-### Автоматическое тестирование
+### Make commands
 ```bash
-# Запуск всех тестов
+make help                 # Show all available commands
+make build               # Build Docker image
+make build-local         # Build local binary
+make run                 # Run in Docker
+make run-local           # Run locally (HTTP mode)
+make run-stdio           # Run in stdio mode
+make test                # Run tests in Docker
+```
+
+## 🔍 Testing and Debugging
+
+### Automated testing
+```bash
+# Run all tests
 ./test.sh
 
-# Запуск Go unit тестов
+# Run Go unit tests
 go test -v
+# Or using Make
+make test
 
-# Ручное тестирование stdio режима
+# Manual stdio mode testing
 echo '{"id": "1", "method": "tools/list"}' | ./sequentialthinking-server --stdio
 ```
 
-### HTTP API тестирование
+### HTTP API testing
 ```bash
-# Запуск сервера в фоне
+# Start server in background
 PORT=8083 ./sequentialthinking-server &
 
-# Список доступных инструментов
+# List available tools
 curl -X POST http://localhost:8083/mcp \
   -H "Content-Type: application/json" \
   -d '{"id": "1", "method": "tools/list"}'
 
-# Вызов sequential thinking
+# Call sequential thinking
 curl -X POST http://localhost:8083/mcp \
   -H "Content-Type: application/json" \
   -d '{
@@ -117,7 +166,7 @@ curl -X POST http://localhost:8083/mcp \
     "params": {
       "name": "sequentialthinking",
       "arguments": {
-        "thought": "Анализирую эту проблему пошагово",
+        "thought": "Analyzing this problem step by step",
         "thoughtNumber": 1,
         "totalThoughts": 3,
         "nextThoughtNeeded": true
@@ -125,46 +174,46 @@ curl -X POST http://localhost:8083/mcp \
     }
   }'
 
-# Подключение к SSE потоку
+# Connect to SSE stream
 curl -N http://localhost:8083/events
 ```
 
-### Веб-интерфейс
-Откройте `http://localhost:8080` для интерактивного тестирования с визуальным интерфейсом.
+### Web interface
+Open `http://localhost:8080` for interactive testing with visual interface.
 
-## 🧠 Инструмент Sequential Thinking
+## 🧠 Sequential Thinking Tool
 
-Предоставляет структурированный подход к решению сложных задач через пошаговое мышление.
+Provides a structured approach to solving complex problems through step-by-step thinking.
 
-### Основные параметры:
-- **`thought`** *(string)*: Текущий шаг размышления  
-- **`thoughtNumber`** *(integer)*: Номер текущей мысли (начиная с 1)
-- **`totalThoughts`** *(integer)*: Оценочное общее количество шагов
-- **`nextThoughtNeeded`** *(boolean)*: Требуется ли следующий шаг
+### Main parameters:
+- **`thought`** *(string)*: Current thinking step  
+- **`thoughtNumber`** *(integer)*: Current thought number (starting from 1)
+- **`totalThoughts`** *(integer)*: Estimated total number of steps
+- **`nextThoughtNeeded`** *(boolean)*: Whether the next step is required
 
-### Дополнительные параметры:
-- **`isRevision`** *(boolean)*: Пересматривает ли данная мысль предыдущую
-- **`revisesThought`** *(integer)*: Номер пересматриваемой мысли
-- **`branchFromThought`** *(integer)*: Точка ветвления для альтернативных подходов  
-- **`branchId`** *(string)*: Идентификатор ветки
-- **`needsMoreThoughts`** *(boolean)*: Индикатор необходимости дополнительных шагов
+### Additional parameters:
+- **`isRevision`** *(boolean)*: Whether this thought revises a previous one
+- **`revisesThought`** *(integer)*: Number of the thought being revised
+- **`branchFromThought`** *(integer)*: Branching point for alternative approaches  
+- **`branchId`** *(string)*: Branch identifier
+- **`needsMoreThoughts`** *(boolean)*: Indicator of the need for additional steps
 
-### Примеры использования:
+### Usage examples:
 
-#### Базовое последовательное мышление:
+#### Basic sequential thinking:
 ```json
 {
-  "thought": "Начинаю анализ алгоритма сортировки",
+  "thought": "Starting analysis of the sorting algorithm",
   "thoughtNumber": 1,
   "totalThoughts": 5, 
   "nextThoughtNeeded": true
 }
 ```
 
-#### Пересмотр предыдущего решения:
+#### Revising previous solution:
 ```json
 {
-  "thought": "Пересматриваю выбор структуры данных с учетом требований производительности",
+  "thought": "Reconsidering the data structure choice given performance requirements",
   "thoughtNumber": 3,
   "totalThoughts": 6,
   "nextThoughtNeeded": true,
@@ -173,91 +222,94 @@ curl -N http://localhost:8083/events
 }
 ```
 
-## 🔧 Режимы работы и архитектура
+## 🔧 Operating Modes and Architecture
 
-### 📡 Stdio режим (MCP совместимость)
-- **Назначение**: Интеграция с MCP клиентами (VS Code, Claude Desktop)
-- **Протокол**: JSON-RPC через stdin/stdout
-- **Запуск**: `./sequentialthinking-server --stdio`
-- **Особенности**: Полная совместимость с MCP спецификацией 2025-03-26
+### 📡 Stdio Mode (MCP Compatibility)
+- **Purpose**: Integration with MCP clients (VS Code, Claude Desktop)
+- **Protocol**: JSON-RPC over stdin/stdout
+- **Launch**: `./sequentialthinking-server --stdio`
+- **Features**: Full compatibility with MCP specification 2025-03-26
 
-### 🌐 HTTP+SSE режим (Веб-интерфейс)
-- **Назначение**: Отладка, тестирование, веб-интеграция
-- **Протокол**: HTTP API + Server-Sent Events
-- **Запуск**: `./sequentialthinking-server` (по умолчанию порт 8080)
-- **Эндпоинты**:
-  - `GET /` - Веб-интерфейс для тестирования
-  - `POST /mcp` - MCP запросы в JSON формате  
-  - `GET /events` - SSE поток событий реального времени
+### 🌐 HTTP+SSE Mode (Web Interface)
+- **Purpose**: Debugging, testing, web integration
+- **Protocol**: HTTP API + Server-Sent Events
+- **Launch**: `./sequentialthinking-server` (default port 8080)
+- **Endpoints**:
+  - `GET /` - Web interface for testing
+  - `POST /mcp` - MCP requests in JSON format  
+  - `GET /events` - SSE real-time event stream
 
-### Преимущества dual-mode архитектуры:
-✅ **Гибкость**: Один сервер для разных сценариев использования  
-✅ **Отладка**: Веб-интерфейс для тестирования и мониторинга  
-✅ **Совместимость**: Полная поддержка MCP стандарта  
-✅ **Масштабируемость**: HTTP режим поддерживает множественные подключения
+### Dual-mode architecture advantages:
+✅ **Flexibility**: One server for different usage scenarios  
+✅ **Debugging**: Web interface for testing and monitoring  
+✅ **Compatibility**: Full MCP standard support  
+✅ **Scalability**: HTTP mode supports multiple connections
 
 
 
-## 🛠️ Технические детали
+## 🛠️ Technical Details
 
-### Системные требования
-- **Go**: версия 1.24 или новее
-- **ОС**: Linux, macOS, Windows  
-- **Зависимости**: Только стандартная библиотека Go (без внешних пакетов)
+### System Requirements
+- **Go**: version 1.24 or newer
+- **OS**: Linux, macOS, Windows  
+- **Dependencies**: Only Go standard library (no external packages)
 
-### Структура проекта
+### Project Structure
 ```
 sequentialthinking/
-├── main.go              # Основной код сервера
-├── main_test.go         # Unit тесты  
-├── go.mod               # Go модуль
-├── build.sh             # Скрипт автоматической сборки
-├── test.sh              # Скрипт тестирования
-├── Dockerfile           # Конфигурация Docker
-├── .gitignore           # Правила игнорирования Git
-├── README.md            # Документация
-├── EXAMPLES_USAGE.md    # Примеры использования
-└── VS_CODE_USAGE.md     # Руководство по VS Code
+├── main.go              # Main server code
+├── main_test.go         # Unit tests  
+├── go.mod               # Go module
+├── Makefile             # Build automation
+├── test.sh              # Testing script
+├── Dockerfile           # Docker configuration
+├── README.md            # Documentation
+├── sequentialthinking-server # Compiled binary
+└── templates/
+    └── index.html       # Web interface template
 ```
 
-### Сборка и развертывание
+### Building and Deployment
 ```bash
-# Клонирование и сборка
-git clone <repository-url>
+# Clone and build
+git clone https://github.com/ad/sequentialthinking.git
 cd sequentialthinking
-./build.sh
 
-# Ручная сборка
+# Local build
 go build -o sequentialthinking-server main.go
+# Or using Make
+make build-local
 
-# Сборка для разных платформ
+# Docker build
+make build
+
+# Cross-platform builds
 GOOS=linux GOARCH=amd64 go build -o sequentialthinking-linux main.go
 GOOS=windows GOARCH=amd64 go build -o sequentialthinking.exe main.go
 GOOS=darwin GOARCH=arm64 go build -o sequentialthinking-macos main.go
 ```
 
-### Конфигурация
-- **Порт HTTP сервера**: переменная окружения `PORT` (по умолчанию 8080)
-- **Логирование**: все логи выводятся в stderr
-- **Режим работы**: определяется наличием флага `--stdio`
+### Configuration
+- **HTTP server port**: `PORT` environment variable (default 8080)
+- **Logging**: all logs output to stderr
+- **Operating mode**: determined by presence of `--stdio` flag
 
 ---
 
-**✨ Статус проекта**: Активная разработка  
-**🔄 Последнее обновление**: 13 июня 2025  
-**📝 Лицензия**: MIT License
+**✨ Project Status**: Active Development 
+**📝 License**: MIT License
 
 ---
 
-## 📚 Дополнительные ресурсы
+## 📚 Additional Resources
 
-- 🌐 **[Model Context Protocol](https://modelcontextprotocol.io/)** - Официальная документация MCP
-- 🐙 **[GitHub Copilot Chat](https://docs.github.com/en/copilot/github-copilot-chat)** - Документация по Copilot Chat
+- 🌐 **[Model Context Protocol](https://modelcontextprotocol.io/)** - Official MCP documentation
+- 🐙 **[GitHub Copilot Chat](https://docs.github.com/en/copilot/github-copilot-chat)** - Copilot Chat documentation
 
-## 🤝 Поддержка
+## 🤝 Support
 
-Если у вас возникли вопросы или проблемы:
-1. Проверьте документацию в этом репозитории
-2. Изучите логи сервера в stderr
-3. Попробуйте веб-интерфейс для отладки
-4. Создайте issue в репозитории проекта
+If you have questions or issues:
+1. Check the documentation in this repository
+2. Review server logs in stderr
+3. Try the web interface for debugging
+4. Create an issue in the project repository

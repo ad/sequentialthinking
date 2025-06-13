@@ -1,0 +1,12 @@
+defaultBaseImage: scratch
+defaultPlatforms:
+- linux/arm64
+- linux/amd64
+- windows/amd64
+builds:
+- id: app
+  main: .
+  ldflags:
+  - "-s"
+  - "-w"
+  - "-X main.version={{.Env.BUILD_VERSION}}"

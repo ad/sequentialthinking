@@ -1,0 +1,34 @@
+# Build artifacts
+sequentialthinking-server
+*.exe
+*.test
+tmp/
+build-errors.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Documentation
+README.md
+*.md
+
+# Scripts
+*.sh
+
+# Docker
+Dockerfile
+Dockerfile.dev
+.dockerignore
+docker-compose.yml
+
+# Development tools
+.air.toml
+
+# Other
+.DS_Store
+*.log
