@@ -86,10 +86,10 @@ or use docker:
 {
   "servers": {
     "sequentialthinking": {
-      "type": "docker",
-      "image": "danielapatin/sequentialthinking:latest",
-      "args": ["--stdio"]
-    }
+      "type": "stdio",
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "--stdio"]
+    },
   }
 }
 ```
