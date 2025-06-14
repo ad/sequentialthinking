@@ -32,23 +32,23 @@ make build
 
 #### 📡 For MCP clients (VS Code, Claude Desktop) - STDIO mode
 ```bash
-./sequentialthinking-server --stdio
+./sequentialthinking-server -transport stdio
 # Or using Make
 make run-stdio
 ```
 
 #### 🌐 For real-time web applications - SSE mode
 ```bash
-./sequentialthinking-server --sse
+./sequentialthinking-server -transport sse
 # Or with custom port
-./sequentialthinking-server --sse --port 3000
+./sequentialthinking-server -transport sse -port 3000
 ```
 
 #### 🔗 For traditional web services - HTTP mode
 ```bash
-./sequentialthinking-server --http
+./sequentialthinking-server -transport http
 # Or with custom port
-./sequentialthinking-server --http -port 9090
+./sequentialthinking-server -transport http -port 9090
 ```
 
 #### 🐳 Using Docker
@@ -59,7 +59,7 @@ make run
 docker run --rm danielapatin/sequentialthinking:latest
 
 # Run with HTTP mode on port 8080
-docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest --http -port 8080
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest -transport http -port 8080
 ```
 
 ### 3. Testing
@@ -73,9 +73,9 @@ make test
 make build-local
 
 # Test different transport modes
-./sequentialthinking-server  -transport stdio   # Test STDIO mode
-./sequentialthinking-server  -transport sse     # Test SSE mode on port 8080
-./sequentialthinking-server  -transport http    # Test HTTP mode on port 8080
+./sequentialthinking-server -transport stdio   # Test STDIO mode
+./sequentialthinking-server -transport sse     # Test SSE mode on port 8080
+./sequentialthinking-server -transport http    # Test HTTP mode on port 8080
 ```
 
 ## 🚀 Usage
@@ -232,7 +232,7 @@ curl -X POST http://localhost:8083/mcp \
   }'
 
 # Connect to SSE stream
-curl -N http://localhost:8083/events
+curl -N http://localhost:8083/sse
 ```
 
 ### Web interface
