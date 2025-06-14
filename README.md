@@ -90,7 +90,7 @@ Add to `~/Library/Application Support/Code/User/settings.json`:
       "sequentialthinking": {
         "type": "stdio", 
         "command": "/absolute/path/to/sequentialthinking-server",
-        "args": ["--stdio"]
+        "args": ["-transport", "stdio"]
       }
     }
   }
@@ -106,7 +106,7 @@ Or use Docker:
       "sequentialthinking": {
         "type": "stdio",
         "command": "docker",
-        "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "--stdio"]
+        "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "-transport", "stdio"]
       }
     }
   }
@@ -120,7 +120,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "sequentialthinking": {
       "command": "/absolute/path/to/sequentialthinking-server",
-      "args": ["--stdio"]
+      "args": ["-transport", "stdio"],
     }
   }
 }
@@ -168,13 +168,13 @@ docker build -t danielapatin/sequentialthinking:latest .
 make build
 
 # Run container (STDIO mode)
-docker run --rm danielapatin/sequentialthinking:latest --stdio
+docker run --rm danielapatin/sequentialthinking:latest -transport stdio
 
 # Run container (HTTP mode with port mapping)
-docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest  -transport http -port 8083
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest -transport http -port 8083
 
 # Run container (SSE mode with port mapping)
-docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest  -transport sse -port 8084
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest -transport sse -port 8084
 ```
 
 ### Make commands
@@ -201,7 +201,7 @@ go test -v
 make test
 
 # Manual stdio mode testing
-echo '{"id": "1", "method": "tools/list"}' | ./sequentialthinking-server --stdio
+echo '{"id": "1", "method": "tools/list"}' | ./sequentialthinking-server -transport stdio
 ```
 
 ### HTTP API testing
@@ -284,17 +284,22 @@ Provides a structured approach to solving complex problems through step-by-step 
 ### 📡 Stdio Mode (MCP Compatibility)
 - **Purpose**: Integration with MCP clients (VS Code, Claude Desktop)
 - **Protocol**: JSON-RPC over stdin/stdout
-- **Launch**: `./sequentialthinking-server --stdio`
+- **Launch**: `./sequentialthinking-server -transport stdio`
 - **Features**: Full compatibility with MCP specification 2025-03-26
 
-### 🌐 HTTP+SSE Mode (Web Interface)
+### 🌐 SSE Mode
 - **Purpose**: Debugging, testing, web integration
-- **Protocol**: HTTP API + Server-Sent Events
-- **Launch**: `./sequentialthinking-server` (default port 8080)
+- **Protocol**: Server-Sent Events
+- **Launch**: `./sequentialthinking-server -transport sse` (default port 8080)
 - **Endpoints**:
-  - `GET /` - Web interface for testing
-  - `POST /mcp` - MCP requests in JSON format  
-  - `GET /events` - SSE real-time event stream
+  - `POST /sse` - SSE real-time event stream
+
+### 🌐 HTTP Mode
+- **Purpose**: Debugging, testing, web integration
+- **Protocol**: HTTP API
+- **Launch**: `./sequentialthinking-server -transport http` (default port 8080)
+- **Endpoints**:
+  - `POST /mcp` - MCP requests in JSON format
 
 ### Dual-mode architecture advantages:
 ✅ **Flexibility**: One server for different usage scenarios  
@@ -317,13 +322,11 @@ sequentialthinking/
 ├── main.go              # Main server code
 ├── main_test.go         # Unit tests  
 ├── go.mod               # Go module
+├── go.sum               # Go dependencies
 ├── Makefile             # Build automation
 ├── test.sh              # Testing script
 ├── Dockerfile           # Docker configuration
-├── README.md            # Documentation
-├── sequentialthinking-server # Compiled binary
-└── templates/
-    └── index.html       # Web interface template
+└── README.md            # Documentation
 ```
 
 ### Building and Deployment
@@ -347,13 +350,12 @@ GOOS=darwin GOARCH=arm64 go build -o sequentialthinking-macos main.go
 ```
 
 ### Configuration
-- **HTTP server port**: `PORT` environment variable (default 8080)
+- **HTTP server port**: `-port 8080` variable (default 8080)
+- **Operating mode**: determined by presence of `-transport stdio` flag
 - **Logging**: all logs output to stderr
-- **Operating mode**: determined by presence of `--stdio` flag
 
 ---
 
-**✨ Project Status**: Active Development 
 **📝 License**: MIT License
 
 ---
