@@ -14,15 +14,23 @@ test:
 
 # Build binary locally
 build-local:
-	go build -o sequentialthinking-server main.go
+	go build -o sequentialthinking-server .
 
-# Run locally
+# Run locally (STDIO mode - default)
 run-local:
 	./sequentialthinking-server
 
-# Run in stdio mode
+# Run in stdio mode (explicit)
 run-stdio:
-	./sequentialthinking-server --stdio
+	./sequentialthinking-server -transport stdio
+
+# Run in SSE mode
+run-sse:
+	./sequentialthinking-server -transport sse -port 8080
+
+# Run in HTTP mode  
+run-http:
+	./sequentialthinking-server -transport http -port 8080
 
 # Show help
 help:
@@ -31,6 +39,8 @@ help:
 	@echo "  run         - Run production container"
 	@echo "  test        - Run tests in container"
 	@echo "  build-local - Build binary locally"
-	@echo "  run-local   - Run locally"
-	@echo "  run-stdio   - Run in stdio mode"
+	@echo "  run-local   - Run locally (STDIO mode)"
+	@echo "  run-stdio   - Run in STDIO mode"
+	@echo "  run-sse     - Run in SSE mode on port 8080"
+	@echo "  run-http    - Run in HTTP mode on port 8080"
 	@echo "  help        - Show this help"

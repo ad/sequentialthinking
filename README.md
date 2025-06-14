@@ -1,8 +1,11 @@
 # Sequential Thinking MCP Server
 
-🧠 **Intelligent MCP Server** for step-by-step analysis and solving complex problems with support for **two operating modes**:
-- **Stdio mode** for full compatibility with MCP clients (VS Code, Claude Desktop)
-- **HTTP+SSE mode** for web interface and advanced debugging
+🧠 **Intelligent MCP Server** for step-by-step analysis and solving complex problems using the powerful [mcp-go](https://github.com/mark3labs/mcp-go) library.
+
+Supports **multiple transport protocols**:
+- **STDIO** - For MCP clients (VS Code, Claude Desktop)
+- **SSE (Server-Sent Events)** - For real-time web applications  
+- **StreamableHTTP** - For traditional web services and REST-like interactions
 
 ## ⚡ Quick Start
 
@@ -11,6 +14,9 @@
 # Clone repository
 git clone https://github.com/ad/sequentialthinking.git
 cd sequentialthinking
+
+# Install dependencies
+go mod tidy
 
 # Local build using Go
 go build -o sequentialthinking-server main.go
@@ -24,50 +30,58 @@ make build
 
 ### 2. Running the server
 
-#### 📡 For MCP clients (VS Code, Claude Desktop)
+#### 📡 For MCP clients (VS Code, Claude Desktop) - STDIO mode
 ```bash
 ./sequentialthinking-server --stdio
 # Or using Make
 make run-stdio
 ```
 
-#### 🌐 For web development and debugging
+#### 🌐 For real-time web applications - SSE mode
 ```bash
-./sequentialthinking-server
+./sequentialthinking-server --sse
 # Or with custom port
-PORT=3000 ./sequentialthinking-server
-# Or using Make
-make run-local
+./sequentialthinking-server --sse --port 3000
+```
+
+#### 🔗 For traditional web services - HTTP mode
+```bash
+./sequentialthinking-server --http
+# Or with custom port
+./sequentialthinking-server --http -port 9090
 ```
 
 #### 🐳 Using Docker
 ```bash
-# Run in Docker
+# Run in Docker (default STDIO mode)
 make run
 # Or manually
-docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest
+docker run --rm danielapatin/sequentialthinking:latest
+
+# Run with HTTP mode on port 8080
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest --http -port 8080
 ```
 
 ### 3. Testing
 ```bash
-# Automated testing
-./test.sh
-
 # Go unit tests
 go test -v
 # Or using Make
 make test
 
-# Web interface
-open http://localhost:8080
+# Test build
+make build-local
+
+# Test different transport modes
+./sequentialthinking-server  -transport stdio   # Test STDIO mode
+./sequentialthinking-server  -transport sse     # Test SSE mode on port 8080
+./sequentialthinking-server  -transport http    # Test HTTP mode on port 8080
 ```
-
-
 
 ## 🚀 Usage
 
 ### Integration with VS Code
-~/Library/Application Support/Code/User/settings.json
+Add to `~/Library/Application Support/Code/User/settings.json`:
 
 ```json
 {
@@ -83,10 +97,9 @@ open http://localhost:8080
 }
 ```
 
-or use docker:
+Or use Docker:
 
 ```json
-// ~/Library/Application Support/Code/User/settings.json
 {
   "mcp": {
     "servers": {
@@ -94,7 +107,7 @@ or use docker:
         "type": "stdio",
         "command": "docker",
         "args": ["run", "--rm", "-i", "danielapatin/sequentialthinking:latest", "--stdio"]
-      },
+      }
     }
   }
 }
@@ -113,6 +126,40 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
+### Web Integration (SSE/HTTP modes)
+For web applications, you can use SSE or HTTP transport:
+
+```javascript
+// SSE Client Example
+const eventSource = new EventSource('http://localhost:8080/sse');
+eventSource.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    console.log('Received:', data);
+};
+
+// HTTP Client Example
+fetch('http://localhost:8080/mcp', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/call',
+        params: {
+            name: 'sequentialthinking',
+            arguments: {
+                thought: 'Analyzing the problem step by step',
+                thoughtNumber: 1,
+                totalThoughts: 3,
+                nextThoughtNeeded: true
+            }
+        }
+    })
+});
+```
+
 ### Docker deployment
 ```bash
 # Build image
@@ -120,10 +167,14 @@ docker build -t danielapatin/sequentialthinking:latest .
 # Or using Make
 make build
 
-# Run container
-docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest
-# Or using Make
-make run
+# Run container (STDIO mode)
+docker run --rm danielapatin/sequentialthinking:latest --stdio
+
+# Run container (HTTP mode with port mapping)
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest  -transport http -port 8083
+
+# Run container (SSE mode with port mapping)
+docker run --rm -p 8080:8080 danielapatin/sequentialthinking:latest  -transport sse -port 8084
 ```
 
 ### Make commands

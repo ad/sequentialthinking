@@ -5,15 +5,14 @@ WORKDIR /app
 # Install ca-certificates for HTTPS requests
 RUN apk --no-cache add ca-certificates
 
-# Copy go.mod for dependency caching
-COPY go.mod ./
+# Copy go.mod and go.sum for dependency caching
+COPY go.mod go.sum ./
 
 # Download dependencies
 RUN go mod download
 
-# Copy source code and templates
+# Copy source code
 COPY main.go ./
-COPY templates/ ./templates/
 
 # Build application
 RUN CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' -o /app/sequentialthinking-server main.go
