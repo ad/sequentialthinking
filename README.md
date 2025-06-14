@@ -81,7 +81,14 @@ make build-local
 ## 🚀 Usage
 
 ### Integration with VS Code
-Add to `~/Library/Application Support/Code/User/settings.json`:
+
+## Usage with VS Code
+
+For quick installation, click the installation button below...
+
+[![Install with Docker in VS Code](https://img.shields.io/badge/VS_Code-Docker-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=sequentialthinking&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22docker%22%2C%22args%22%3A%5B%22run%22%2C%22-i%22%2C%22--rm%22%2C%22danielapatin%2Fsequentialthinking%3Alatest%22%2C%22-transport%22%2C%22stdio%22%5D%7D) 
+
+Or add to `~/Library/Application Support/Code/User/settings.json`:
 
 ```json
 {
