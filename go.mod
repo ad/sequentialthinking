@@ -2,7 +2,7 @@ module github.com/ad/sequentialthinking
 
 go 1.24
 
-require github.com/mark3labs/mcp-go v0.32.0
+require github.com/mark3labs/mcp-go v0.35.0
 
 require (
 	github.com/google/uuid v1.6.0 // indirect
